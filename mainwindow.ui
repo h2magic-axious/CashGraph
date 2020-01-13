@@ -343,8 +343,8 @@
     <property name="geometry">
      <rect>
       <x>460</x>
-      <y>300</y>
-      <width>58</width>
+      <y>290</y>
+      <width>61</width>
       <height>16</height>
      </rect>
     </property>
@@ -356,7 +356,7 @@
     <property name="geometry">
      <rect>
       <x>450</x>
-      <y>350</y>
+      <y>340</y>
       <width>41</width>
       <height>21</height>
      </rect>
@@ -366,7 +366,7 @@
     <property name="geometry">
      <rect>
       <x>510</x>
-      <y>330</y>
+      <y>320</y>
       <width>41</width>
       <height>16</height>
      </rect>
@@ -379,7 +379,7 @@
     <property name="geometry">
      <rect>
       <x>450</x>
-      <y>330</y>
+      <y>320</y>
       <width>41</width>
       <height>16</height>
      </rect>
@@ -389,14 +389,6 @@
     </property>
    </widget>
    <widget class="QLabel" name="label_16">
-    <property name="geometry">
-     <rect>
-      <x>570</x>
-      <y>330</y>
-      <width>51</width>
-      <height>16</height>
-     </rect>
-    </property>
     <property name="text">
      <string>因数杠杆</string>
     </property>
@@ -405,7 +397,7 @@
     <property name="geometry">
      <rect>
       <x>630</x>
-      <y>330</y>
+      <y>320</y>
       <width>51</width>
       <height>16</height>
      </rect>
@@ -418,7 +410,7 @@
     <property name="geometry">
      <rect>
       <x>510</x>
-      <y>350</y>
+      <y>340</y>
       <width>41</width>
       <height>21</height>
      </rect>
@@ -428,7 +420,7 @@
     <property name="geometry">
      <rect>
       <x>570</x>
-      <y>350</y>
+      <y>340</y>
       <width>41</width>
       <height>21</height>
      </rect>
@@ -441,7 +433,7 @@
     <property name="geometry">
      <rect>
       <x>630</x>
-      <y>350</y>
+      <y>340</y>
       <width>41</width>
       <height>21</height>
      </rect>
@@ -454,7 +446,7 @@
     <property name="geometry">
      <rect>
       <x>460</x>
-      <y>430</y>
+      <y>460</y>
       <width>58</width>
       <height>16</height>
      </rect>
@@ -467,7 +459,7 @@
     <property name="geometry">
      <rect>
       <x>460</x>
-      <y>460</y>
+      <y>490</y>
       <width>58</width>
       <height>16</height>
      </rect>
@@ -480,7 +472,7 @@
     <property name="geometry">
      <rect>
       <x>510</x>
-      <y>460</y>
+      <y>490</y>
       <width>291</width>
       <height>21</height>
      </rect>
@@ -490,7 +482,7 @@
     <property name="geometry">
      <rect>
       <x>460</x>
-      <y>490</y>
+      <y>520</y>
       <width>112</width>
       <height>32</height>
      </rect>
@@ -503,7 +495,7 @@
     <property name="geometry">
      <rect>
       <x>680</x>
-      <y>490</y>
+      <y>520</y>
       <width>112</width>
       <height>32</height>
      </rect>
@@ -515,8 +507,8 @@
    <widget class="QLabel" name="label_21">
     <property name="geometry">
      <rect>
-      <x>650</x>
-      <y>300</y>
+      <x>730</x>
+      <y>320</y>
       <width>58</width>
       <height>16</height>
      </rect>
@@ -528,8 +520,8 @@
    <widget class="QLineEdit" name="lineEdit_17">
     <property name="geometry">
      <rect>
-      <x>712</x>
-      <y>300</y>
+      <x>700</x>
+      <y>340</y>
       <width>101</width>
       <height>21</height>
      </rect>
@@ -538,8 +530,8 @@
    <widget class="QPushButton" name="pushButton_7">
     <property name="geometry">
      <rect>
-      <x>700</x>
-      <y>340</y>
+      <x>450</x>
+      <y>370</y>
       <width>112</width>
       <height>32</height>
      </rect>
@@ -559,6 +551,32 @@
     </property>
     <property name="text">
      <string>删除</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_9">
+    <property name="geometry">
+     <rect>
+      <x>690</x>
+      <y>220</y>
+      <width>81</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>清空</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_10">
+    <property name="geometry">
+     <rect>
+      <x>700</x>
+      <y>370</y>
+      <width>81</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>清空</string>
     </property>
    </widget>
   </widget>

@@ -67,6 +67,9 @@ MainWindow::MainWindow()
     multEdit = installLineEdit(560, 350);
     powerEdit = installLineEdit(640, 350);
 
+    multEdit->setText(QString::number(1,10));
+    powerEdit->setText(QString::number(1,10));
+
     pathEdit = new QLineEdit(this);
     pathEdit->setGeometry(450, 430, 320, 20);
     pathEdit->setText(dbPath);
@@ -83,8 +86,11 @@ MainWindow::MainWindow()
 
     dateEdit->setText(QDate::currentDate().toString("yyyyMMdd"));
 
+    initComputer();
+
     connect(addRecordButton, &QPushButton::clicked, this, &MainWindow::getAddRecordInput);
     connect(clearButton, &QPushButton::clicked, this, &MainWindow::clearAddRecordInput);
+    connect(computeButton, &QPushButton::clicked, this, &MainWindow::computeInvestment);
 }
 
 void MainWindow::printAllRecord()
@@ -176,4 +182,26 @@ QPushButton *MainWindow::installButton(int x, int y, QString text)
     tempButton->setGeometry(x, y, buttonHSize, buttonVSize);
     tempButton->setText(text);
     return tempButton;
+}
+
+void MainWindow::computeInvestment()
+{
+    double baseInv = baseInvestmentEdit->text().toDouble();
+    double rate = rateEdit->text().toDouble();
+    double _mult = multEdit->text().toDouble();
+    double _power = powerEdit->text().toDouble();
+
+    double res = sumInvestment * (1 + rate);
+    res = sumInvestment + baseInv - res;
+    res = pow(_mult * res, _power);
+
+    computeResultEdit->setText(QString::number(res, 10, 2));
+}
+
+void MainWindow::initComputer()
+{
+    baseInvestmentEdit->setText(QString::number(0,10));
+    rateEdit->setText(QString::number(0,0));
+    multEdit->setText(QString::number(1,10));
+    powerEdit->setText(QString::number(1,10));
 }

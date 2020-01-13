@@ -12,6 +12,7 @@
 #include <QPushButton>
 #include <QLineEdit>
 #include <QDate>
+#include <cmath>
 
 #include <QList>
 
@@ -45,6 +46,8 @@ class MainWindow : public  QWidget{
 
     int labelHSize = 60;
     int labelVSize = 16;
+
+    int sumInvestment = 0;
 
     QString dbPath;
 
@@ -94,6 +97,9 @@ public:
     void installLabel(int x, int y, QString test);
     QLineEdit* installLineEdit(int x, int y, QValidator *validator = new QDoubleValidator, int width=65,int height=20);
     QPushButton* installButton(int x, int y, QString text);
+
+    void computeInvestment();
+    void initComputer();
 };
 
 

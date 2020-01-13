@@ -13,58 +13,87 @@
 #include <QLineEdit>
 #include <QDate>
 
+#include <QList>
+
+class Record{
+public:
+    int id;
+    int date;
+    int investment;
+    double worth;
+    double share;
+    double fee;
+};
+
+typedef QList<Record> RecordList;
+
 class MainWindow : public  QWidget{
     Q_OBJECT
     QSize windowSize = QSize(800,600);
 
     QTableWidget *cashTableWidget;
     QString headers[6] = {QString("Id"), QString("日期"),QString("投入"),QString("净值"),QString("份额"),QString("手续费")};
-    int tableHSize;
-    int tableVSize;
-    int itemHSize;
-    int itemVSize;
 
     QFont font;
+    RecordList records;
 
-    int recordLength = 1;
+    int recordNumber = 0;
     int rowNumber = 20;
 
-    void addNewRecord(QString date, int inv, double worth, double share, double fee);
-    void addNRow(int n);
+    int buttonHSize = 100;
+    int buttonVSize = 30;
 
+    int labelHSize = 60;
+    int labelVSize = 16;
 
-    int newHSize;
-    int newVSize;
-    int startX = 400;
-    int startY = 30;
+    QString dbPath;
 
     QLineEdit *dateEdit;
-    QString date;
-
     QLineEdit *investmentEdit;
-    int investment;
-
     QLineEdit *worthEdit;
-    double worth;
-
     QLineEdit *shareEdit;
-    double share;
-
     QLineEdit *feeEdit;
-    double fee;
+    QLineEdit *identEdit;
+    QLineEdit *updateDateEdit;
+    QLineEdit *updateInvestmentEdit;
+    QLineEdit *updateWorthEdit;
+    QLineEdit *updateShareEdit;
+    QLineEdit *updateFeeEdit;
+    QLineEdit *computeResultEdit;
+    QLineEdit *baseInvestmentEdit;
+    QLineEdit *rateEdit;
+    QLineEdit *multEdit;
+    QLineEdit *powerEdit;
+    QLineEdit *pathEdit;
 
     QPushButton *addRecordButton;
     QPushButton *clearButton;
-
-    void getAddRecordInput();
-    void clearLineEdit();
-
-signals:
-    void sendRecord(QString date, int inv, double worth, double share, double fee);
+    QPushButton *searchButton;
+    QPushButton *deleteButton;
+    QPushButton *updateButton;
+    QPushButton *updateClearButton;
+    QPushButton *computeButton;
+    QPushButton *importButton;
+    QPushButton *exportButton;
 
 public:
     MainWindow();
-    ~MainWindow() = default;
+    ~MainWindow(){
+
+    }
+
+    void printAllRecord();
+    void printARecord(int rowId, Record r);
+
+    void addNewRecord(Record r);
+    void addNRow(int n);
+
+    Record getAddRecordInput();
+    void clearAddRecordInput();
+
+    void installLabel(int x, int y, QString test);
+    QLineEdit* installLineEdit(int x, int y, QValidator *validator = new QDoubleValidator, int width=65,int height=20);
+    QPushButton* installButton(int x, int y, QString text);
 };
 
 

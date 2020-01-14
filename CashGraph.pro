@@ -16,11 +16,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    DataManager.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    sqlite3.c
 
 HEADERS += \
-    mainwindow.h
+    DataManager.h \
+    Model.h \
+    mainwindow.h \
+    sqlite3ext.h
 
 FORMS += \
     mainwindow.ui

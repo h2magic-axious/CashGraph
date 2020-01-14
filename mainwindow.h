@@ -13,20 +13,10 @@
 #include <QLineEdit>
 #include <QDate>
 #include <cmath>
-
 #include <QList>
 
-class Record{
-public:
-    int id;
-    int date;
-    int investment;
-    double worth;
-    double share;
-    double fee;
-};
-
-typedef QList<Record> RecordList;
+#include "Model.h"
+#include "sqlite3.h"
 
 class MainWindow : public  QWidget{
     Q_OBJECT

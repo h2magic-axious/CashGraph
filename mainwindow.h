@@ -2,95 +2,88 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QWidget>
-#include <QSize>
-#include <QObject>
-#include <QTableWidget>
+#include <QValidator>
 #include <QTableWidgetItem>
-#include <QHeaderView>
-#include <QLabel>
-#include <QPushButton>
-#include <QLineEdit>
 #include <QDate>
+#include <QDateTime>
+#include <QDialog>
+#include <QObject>
+
+#include <QDebug>
 #include <cmath>
-#include <QList>
 
 #include "Model.h"
-#include "sqlite3.h"
 
-class MainWindow : public  QWidget{
+QT_BEGIN_NAMESPACE
+namespace Ui { class MainWindow; }
+QT_END_NAMESPACE
+
+class MainWindow : public QMainWindow
+{
     Q_OBJECT
-    QSize windowSize = QSize(800,600);
+public:
+    MainWindow(QWidget *parent = nullptr);
+    ~MainWindow();
 
-    QTableWidget *cashTableWidget;
-    QString headers[6] = {QString("Id"), QString("日期"),QString("投入"),QString("净值"),QString("份额"),QString("手续费")};
+private slots:
+    void on_updateSumButton_clicked();
+
+    void on_addNewRecordButton_clicked();
+
+    void on_addClearButton_clicked();
+
+    void on_searchFromIDButton_clicked();
+
+    void on_updateClearButton_clicked();
+
+    void on_deleteRecordButton_clicked();
+
+    void on_updateRecordButton_clicked();
+
+    void on_computeClearButton_clicked();
+
+    void on_computeButton_clicked();
+
+    void on_exportButton_clicked();
+
+private:
+    int rowNumber = 0;
+    int tableHSize = 30;
+    int tableItemVSize[6] = {50,80,80,80,80,50};
+    int memorySearch = -1;
 
     QFont font;
-    RecordList records;
+    RecordList recordList;
 
-    int recordNumber = 0;
-    int rowNumber = 20;
+    QString saveFilePath = "cash.db";
 
-    int buttonHSize = 100;
-    int buttonVSize = 30;
+    Server *server;
+    Ui::MainWindow *ui;
+    QValidator *OnlyInt = new QIntValidator;
+    QValidator *OnlyDouble = new QDoubleValidator;
 
-    int labelHSize = 60;
-    int labelVSize = 16;
+    void addRow(int n=20);
 
-    int sumInvestment = 0;
+    QTableWidgetItem *newItem();
 
-    QString dbPath;
+    void initTableDisplay();
 
-    QLineEdit *dateEdit;
-    QLineEdit *investmentEdit;
-    QLineEdit *worthEdit;
-    QLineEdit *shareEdit;
-    QLineEdit *feeEdit;
-    QLineEdit *identEdit;
-    QLineEdit *updateDateEdit;
-    QLineEdit *updateInvestmentEdit;
-    QLineEdit *updateWorthEdit;
-    QLineEdit *updateShareEdit;
-    QLineEdit *updateFeeEdit;
-    QLineEdit *computeResultEdit;
-    QLineEdit *baseInvestmentEdit;
-    QLineEdit *rateEdit;
-    QLineEdit *multEdit;
-    QLineEdit *powerEdit;
-    QLineEdit *pathEdit;
+    void insertOneRecord(int row, Record record);
 
-    QPushButton *addRecordButton;
-    QPushButton *clearButton;
-    QPushButton *searchButton;
-    QPushButton *deleteButton;
-    QPushButton *updateButton;
-    QPushButton *updateClearButton;
-    QPushButton *computeButton;
-    QPushButton *importButton;
-    QPushButton *exportButton;
+    void clearTable();
 
-public:
-    MainWindow();
-    ~MainWindow(){
+    void displayAllRecord();
 
-    }
+    QString formatDate(int dateInteger);
 
-    void printAllRecord();
-    void printARecord(int rowId, Record r);
+    inline QString dateToInteger(QDate date);
 
-    void addNewRecord(Record r);
-    void addNRow(int n);
+    QString getText(QLineEdit *lineEdit);
 
-    Record getAddRecordInput();
-    void clearAddRecordInput();
+    Record csvGetWithId(int id);
 
-    void installLabel(int x, int y, QString test);
-    QLineEdit* installLineEdit(int x, int y, QValidator *validator = new QDoubleValidator, int width=65,int height=20);
-    QPushButton* installButton(int x, int y, QString text);
+public slots:
+    void printMessage(const QString& msg);
 
-    void computeInvestment();
-    void initComputer();
 };
-
-
 #endif // MAINWINDOW_H

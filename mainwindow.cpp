@@ -1,207 +1,299 @@
 #include "mainwindow.h"
+#include "ui_mainwindow.h"
 
-MainWindow::MainWindow()
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
 {
-    resize(windowSize);
-    setMaximumSize(windowSize);
-    setMinimumSize(windowSize);
-
     font.setPixelSize(11);
-    dbPath = QString("./db.sqlite3");
+    server = new Server(saveFilePath);
 
-    cashTableWidget = new QTableWidget(this);
-    cashTableWidget->setGeometry(0,0,800,600);
-    cashTableWidget->setRowCount(20);
-    cashTableWidget->setColumnCount(6);
-    cashTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    cashTableWidget->setSelectionMode(QAbstractItemView::NoSelection);
-    cashTableWidget->horizontalHeader()->setVisible(false);
-    cashTableWidget->horizontalHeader()->setDefaultSectionSize(400);
-    cashTableWidget->horizontalHeader()->setHighlightSections(false);
-    cashTableWidget->verticalHeader()->setVisible(false);
-    cashTableWidget->verticalHeader()->setDefaultSectionSize(600);
-    cashTableWidget->verticalHeader()->setHighlightSections(false);
-    addNRow(20);
+    ui->setupUi(this);
+
+    ui->newDateEdit->setValidator(OnlyInt);
+    ui->newDateEdit->setText(dateToInteger(QDate::currentDate()));
+
+    ui->newInvestmentEdit->setValidator(OnlyInt);
+    ui->newWorthEdit->setValidator(OnlyDouble);
+    ui->newShareEdit->setValidator(OnlyDouble);
+    ui->newFeeEdit->setValidator(OnlyDouble);
+
+    ui->updateIDEdit->setValidator(OnlyInt);
+    ui->updateDateEdit->setValidator(OnlyInt);
+    ui->updateInvestmentEdit->setValidator(OnlyInt);
+    ui->updateWorthEdit->setValidator(OnlyDouble);
+    ui->updateShareEdit->setValidator(OnlyDouble);
+    ui->updateFeeEdit->setValidator(OnlyDouble);
+
+    ui->computeBaseEdit->setValidator(OnlyInt);
+    ui->computeRateEdit->setValidator(OnlyDouble);
+    ui->computeMultEdit->setValidator(OnlyDouble);
+    ui->computePowEdit->setValidator(OnlyDouble);
 
     for(int c = 0; c < 6; c++)
-    {
-        cashTableWidget->setColumnWidth(c, 400 / 6);
-        cashTableWidget->item(0,c)->setText(headers[c]);
-    }
+        ui->tableWidget->setColumnWidth(c, tableItemVSize[c]);
 
-    installLabel(400, 30, QString("日期"));
-    installLabel(480, 30, QString("投入"));
-    installLabel(560, 30, QString("净值"));
-    installLabel(640, 30, QString("份额"));
-    installLabel(720, 30, QString("手续费"));
-    installLabel(400, 150, QString("ID"));
-    installLabel(400, 180, QString("日期"));
-    installLabel(480, 180, QString("投入"));
-    installLabel(560, 180, QString("份额"));
-    installLabel(640, 180, QString("净值"));
-    installLabel(720, 180, QString("手续费"));
-    installLabel(400, 300, QString("计算投资"));
-    installLabel(620, 300, QString("计算结果"));
-    installLabel(400, 330, QString("基数"));
-    installLabel(480, 330, QString("收益率"));
-    installLabel(560, 330, QString("因数杠杆"));
-    installLabel(640, 330, QString("指数杠杆"));
-    installLabel(400, 400, QString("导入/导出"));
-    installLabel(400, 430, QString("路径"));
+    ui->filePathEdit->setText(server->absFilePath);
 
+    server->searchAll(&recordList);
 
-    dateEdit = installLineEdit(400,50, new QIntValidator);
-    investmentEdit = installLineEdit(480, 50, new QIntValidator);
-    worthEdit = installLineEdit(560, 50);
-    shareEdit = installLineEdit(640, 50);
-    feeEdit = installLineEdit(720, 50);
-    identEdit = installLineEdit(430, 150, new QIntValidator);
-    updateDateEdit = installLineEdit(400, 200, new QIntValidator);
-    updateInvestmentEdit = installLineEdit(480, 200, new QIntValidator);
-    updateWorthEdit = installLineEdit(560, 200);
-    updateShareEdit = installLineEdit(640, 200);
-    updateFeeEdit = installLineEdit(720,200);
-    computeResultEdit = installLineEdit(700,300);
-    baseInvestmentEdit = installLineEdit(400, 350, new QIntValidator);
-    rateEdit = installLineEdit(480, 350);
-    multEdit = installLineEdit(560, 350);
-    powerEdit = installLineEdit(640, 350);
+    printMessage("程序打开成功");
 
-    multEdit->setText(QString::number(1,10));
-    powerEdit->setText(QString::number(1,10));
+    addRow();
 
-    pathEdit = new QLineEdit(this);
-    pathEdit->setGeometry(450, 430, 320, 20);
-    pathEdit->setText(dbPath);
-
-    addRecordButton = installButton(400, 80, QString("新建记录"));
-    clearButton = installButton(520, 80, QString("清空"));
-    searchButton = installButton(500, 145, QString("查询"));
-    deleteButton = installButton(400, 220, QString("删除"));
-    updateButton = installButton(520, 220, QString("更改"));
-    updateClearButton = installButton(640, 220, QString("清空"));
-    computeButton = installButton(500, 295, QString("开始计算"));
-    importButton = installButton(400, 450, QString("导入数据"));
-    exportButton = installButton(650, 450, QString("导出数据"));
-
-    dateEdit->setText(QDate::currentDate().toString("yyyyMMdd"));
-
-    initComputer();
-
-    connect(addRecordButton, &QPushButton::clicked, this, &MainWindow::getAddRecordInput);
-    connect(clearButton, &QPushButton::clicked, this, &MainWindow::clearAddRecordInput);
-    connect(computeButton, &QPushButton::clicked, this, &MainWindow::computeInvestment);
+    displayAllRecord();
 }
 
-void MainWindow::printAllRecord()
+MainWindow::~MainWindow()
 {
-    for(int c = 0; c < 6; c++){
-        cashTableWidget->item(0,c)->setText(headers[c]);
-    }
-    for(int i = 0; i < records.length(); i++)
-        printARecord(i+1, records[i]);
+    delete ui;
 }
 
-void MainWindow::printARecord(int rowId, Record r)
+void MainWindow::addRow(int n)
 {
-    cashTableWidget->item(rowId, 0)->setText(QString::number(r.id,10));
-    cashTableWidget->item(rowId, 1)->setText(QString::number(r.date,10));
-    cashTableWidget->item(rowId, 2)->setText(QString::number(r.investment, 10));
-    cashTableWidget->item(rowId, 3)->setText(QString::number(r.worth,10,4));
-    cashTableWidget->item(rowId, 4)->setText(QString::number(r.share,10,2));
-    cashTableWidget->item(rowId, 5)->setText(QString::number(r.fee,10,2));
-}
+    ui->tableWidget->setRowCount(rowNumber + n);
 
-void MainWindow::addNewRecord(Record r)
-{
-    recordNumber++;
-    if(recordNumber < rowNumber)
-        addNRow(20);
-
-    printARecord(recordNumber, r);
-}
-
-void MainWindow::addNRow(int n)
-{
-    for(int r = 0;r < n; r++)
-    {
-        for(int c = 0; c < 6; c++)
-        {
-            QTableWidgetItem *item = new QTableWidgetItem;
-            item->setFont(font);
-            item->setTextAlignment(Qt::AlignCenter);
-            item->setText("");
-            cashTableWidget->setItem(r,c,item);
-            cashTableWidget->setRowHeight(r, 30);
-        }
+    for (int r = 0; r < n; r++) {
+        ui->tableWidget->setRowHeight(r, tableHSize);
+        for (int c = 0; c < 6; c++)
+            ui->tableWidget->setItem(r + rowNumber, c, newItem());
     }
     rowNumber += n;
 }
 
-Record MainWindow::getAddRecordInput()
+QTableWidgetItem *MainWindow::newItem()
+{
+    QTableWidgetItem *item = new QTableWidgetItem;
+    item->setFont(font);
+    item->setTextAlignment(Qt::AlignCenter);
+    return item;
+}
+
+void MainWindow::initTableDisplay()
+{
+    ui->tableWidget->item(0,0)->setText(QString("ID"));
+    ui->tableWidget->item(0,1)->setText(QString("日期"));
+    ui->tableWidget->item(0,2)->setText(QString("投入"));
+    ui->tableWidget->item(0,3)->setText(QString("净值"));
+    ui->tableWidget->item(0,4)->setText(QString("份额"));
+    ui->tableWidget->item(0,5)->setText(QString("手续费"));
+}
+
+void MainWindow::insertOneRecord(int row, Record record)
+{
+    ui->tableWidget->item(row, 0)->setText(record.stringId());
+    ui->tableWidget->item(row, 1)->setText(record.stringDate());
+    ui->tableWidget->item(row, 2)->setText(record.stringInv());
+    ui->tableWidget->item(row, 3)->setText(record.stringWorth());
+    ui->tableWidget->item(row, 4)->setText(record.stringShare());
+    ui->tableWidget->item(row, 5)->setText(record.stringFee());
+}
+
+void MainWindow::clearTable()
+{
+    for(int r = 0; r < rowNumber; r++)
+        for(int c = 0; c < 6; c++)
+            ui->tableWidget->item(r, c)->setText(QString(""));
+}
+
+void MainWindow::displayAllRecord()
+{
+    recordList.clear();
+    server->searchAll(&recordList);
+    clearTable();
+    initTableDisplay();
+    int length = recordList.length();
+
+    if(rowNumber < length)
+        addRow(length - rowNumber + 20);
+
+    for(int i = 0; i < length; i++)
+        insertOneRecord(i + 1, recordList[i]);
+
+    printMessage("表格更新完成");
+    on_addClearButton_clicked();
+}
+
+QString MainWindow::formatDate(int dateInteger)
+{
+    // 20180101 [0-4][4-6][6]
+    QString date = QString::number(dateInteger, 10);
+    QString year = date.mid(0,4);
+    QString month = date.mid(4,2);
+    QString day = date.mid(6);
+    return year + '-' + month + '-' + day;
+}
+
+QString MainWindow::dateToInteger(QDate date)
+{
+    return date.toString("yyyyMMdd");
+}
+
+QString MainWindow::getText(QLineEdit *lineEdit)
+{
+    QString temp = lineEdit->text();
+    return temp;
+}
+
+void MainWindow::printMessage(const QString& msg)
+{
+
+    ui->logBrowser->insertPlainText(msg + "\n\n");
+    ui->logBrowser->moveCursor(QTextCursor::Start);
+    ui->logBrowser->insertPlainText(QDateTime::currentDateTime().toString("[yyyy-MM-dd] hh:mm:ss") + '\n');
+    ui->logBrowser->moveCursor(QTextCursor::Start);
+}
+
+void MainWindow::on_updateSumButton_clicked()
+{
+    int sumInvestment = 0;
+    double sumShare = 0.0;
+    double sumFee = 0.0;
+
+    recordList.clear();
+    server->searchAll(&recordList);
+
+    for (int i = 1; i < recordList.length(); i++) {
+        Record r = recordList[i];
+        sumInvestment += r.investment;
+        sumShare += r.share;
+        sumFee += r.fee;
+    }
+
+    ui->sumInvestmentEdit->setText(QString::number(sumInvestment,10));
+    ui->sumShareEdit->setText(QString::number(sumShare, 10, 4));
+    ui->sumFeeEdit->setText(QString::number(sumFee, 10, 2));
+
+    printMessage("统计完成");
+}
+
+void MainWindow::on_addNewRecordButton_clicked()
+{
+    int date = getText(ui->newDateEdit).toInt();
+    int investment = getText(ui->newInvestmentEdit).toInt();
+    double worth = getText(ui->newWorthEdit).toDouble();
+    double share = getText(ui->newShareEdit).toDouble();
+    double fee = getText(ui->filePathEdit).toDouble();
+
+    on_addClearButton_clicked();
+
+    server->insert(Record(date, investment, worth, share, fee));
+    printMessage("添加记录 完成");
+    displayAllRecord();
+}
+
+void MainWindow::on_addClearButton_clicked()
+{
+    ui->newDateEdit->setText(dateToInteger(QDate::currentDate()));
+    ui->newInvestmentEdit->clear();
+    ui->newWorthEdit->clear();
+    ui->newShareEdit->clear();
+    ui->newFeeEdit->clear();
+}
+
+void MainWindow::on_searchFromIDButton_clicked()
+{
+    int id = getText(ui->updateIDEdit).toInt();
+    Record r;
+    ui->updateIDEdit->clear();
+
+    if(server->searchWithId(id, &r))
+    {
+        printMessage("查找成功");
+        memorySearch = id;
+        ui->updateInvestmentEdit->setText(r.stringInv());
+        ui->updateWorthEdit->setText(r.stringWorth());
+        ui->updateShareEdit->setText(r.stringShare());
+        ui->updateFeeEdit->setText(r.stringFee());
+        ui->updateDateEdit->setText(r.stringDate());
+    }
+    else
+    {
+        printMessage("查找失败");
+        memorySearch = -1;
+        on_updateClearButton_clicked();
+    }
+}
+
+void MainWindow::on_updateClearButton_clicked()
+{
+    ui->updateIDEdit->clear();
+    ui->updateDateEdit->clear();
+    ui->updateInvestmentEdit->clear();
+    ui->updateWorthEdit->clear();
+    ui->updateShareEdit->clear();
+    ui->updateFeeEdit->clear();
+    memorySearch = -1;
+}
+
+void MainWindow::on_deleteRecordButton_clicked()
+{
+    if(memorySearch != -1)
+    {
+        server->deleteWithId(memorySearch);
+        printMessage("记录已删除");
+        displayAllRecord();
+    }
+    else
+    {
+        printMessage("未找到记录");
+    }
+
+    memorySearch = -1;
+    on_updateClearButton_clicked();
+}
+
+void MainWindow::on_updateRecordButton_clicked()
 {
     Record r;
-    r.id = recordNumber + 1;
-    r.date = dateEdit->text().toInt();
-    r.investment = investmentEdit->text().toInt();
-    r.worth = worthEdit->text().toDouble();
-    r.fee = feeEdit->text().toDouble();
+    server->searchWithId(memorySearch, &r);
 
-    clearAddRecordInput();
-    return r;
+    r.date = getText(ui->updateDateEdit).toInt();
+    r.investment = getText(ui->updateInvestmentEdit).toInt();
+    r.worth = getText(ui->updateWorthEdit).toDouble();
+    r.share = getText(ui->updateShareEdit).toDouble();
+    r.fee = getText(ui->updateFeeEdit).toDouble();
+
+    server->updateWithRecord(r);
+
+    printMessage("更改成功");
+    memorySearch = -1;
+
+    on_updateClearButton_clicked();
+    displayAllRecord();
 }
 
-
-void MainWindow::clearAddRecordInput()
+void MainWindow::on_computeClearButton_clicked()
 {
-    dateEdit->setText(QDate::currentDate().toString("yyyyMMdd"));
-    investmentEdit->setText("");
-    worthEdit->setText("");
-    shareEdit->setText("");
-    feeEdit->setText("");
+    ui->computeBaseEdit->clear();
+    ui->computeRateEdit->clear();
+    ui->computeMultEdit->setText("1");
+    ui->computePowEdit->setText("1");
+    ui->computeResultEdit->clear();
 }
 
-void MainWindow::installLabel(int x, int y, QString test)
+void MainWindow::on_computeButton_clicked()
 {
-    QLabel *tempLabel = new QLabel(this);
-    tempLabel->setGeometry(x, y, labelHSize, labelVSize);
-    tempLabel->setText(test);
+    double baseInv = getText(ui->computeBaseEdit).toDouble();
+    double rate = getText(ui->computeRateEdit).toDouble();
+    double mult = getText(ui->computeMultEdit).toDouble();
+    double power = getText(ui->computePowEdit).toDouble();
+
+    double inv = getText(ui->sumInvestmentEdit).toDouble();
+    double fee = getText(ui->sumFeeEdit).toDouble();
+
+    double realRate = 1 - rate * (inv - fee) / baseInv;
+    double result = baseInv * pow(mult * realRate, power);
+
+    if(result <= 0)
+        result = 0;
+
+    ui->computeResultEdit->setText(QString::number(result,10,2));
 }
 
-QLineEdit *MainWindow::installLineEdit(int x, int y, QValidator *validator, int width, int height)
+void MainWindow::on_exportButton_clicked()
 {
-    QLineEdit *tempEdit = new QLineEdit(this);
-    tempEdit->setGeometry(x,y,width, height);
-    tempEdit->setValidator(validator);
-    return tempEdit;
-}
-
-QPushButton *MainWindow::installButton(int x, int y, QString text)
-{
-    QPushButton *tempButton = new QPushButton(this);
-    tempButton->setGeometry(x, y, buttonHSize, buttonVSize);
-    tempButton->setText(text);
-    return tempButton;
-}
-
-void MainWindow::computeInvestment()
-{
-    double baseInv = baseInvestmentEdit->text().toDouble();
-    double rate = rateEdit->text().toDouble();
-    double _mult = multEdit->text().toDouble();
-    double _power = powerEdit->text().toDouble();
-
-    double res = sumInvestment * (1 + rate);
-    res = sumInvestment + baseInv - res;
-    res = pow(_mult * res, _power);
-
-    computeResultEdit->setText(QString::number(res, 10, 2));
-}
-
-void MainWindow::initComputer()
-{
-    baseInvestmentEdit->setText(QString::number(0,10));
-    rateEdit->setText(QString::number(0,0));
-    multEdit->setText(QString::number(1,10));
-    powerEdit->setText(QString::number(1,10));
+    server->setFilePath(ui->filePathEdit->text());
+    printMessage("数据载入完成");
+    displayAllRecord();
 }

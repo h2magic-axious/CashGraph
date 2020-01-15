@@ -9,6 +9,9 @@ MainWindow::MainWindow(QWidget *parent)
     server = new Server(saveFilePath);
 
     ui->setupUi(this);
+
+    setTCOrder();
+
     ui->newDateEdit->setValidator(OnlyInt);
     ui->newDateEdit->setText(dateToInteger(QDate::currentDate()));
 
@@ -41,6 +44,7 @@ MainWindow::MainWindow(QWidget *parent)
     addRow();
 
     displayAllRecord();
+    on_updateSumButton_clicked();
 }
 
 MainWindow::~MainWindow()
@@ -132,6 +136,25 @@ QString MainWindow::getText(QLineEdit *lineEdit)
 {
     QString temp = lineEdit->text();
     return temp;
+}
+
+void MainWindow::setTCOrder()
+{
+    QWidget::setTabOrder(ui->newDateEdit, ui->newInvestmentEdit);
+    QWidget::setTabOrder(ui->newInvestmentEdit, ui->newWorthEdit);
+    QWidget::setTabOrder(ui->newWorthEdit, ui->newShareEdit);
+    QWidget::setTabOrder(ui->newShareEdit, ui->newFeeEdit);
+    QWidget::setTabOrder(ui->newFeeEdit, ui->updateIDEdit);
+    QWidget::setTabOrder(ui->updateIDEdit, ui->updateDateEdit);
+    QWidget::setTabOrder(ui->updateDateEdit, ui->updateInvestmentEdit);
+    QWidget::setTabOrder(ui->updateInvestmentEdit, ui->updateWorthEdit);
+    QWidget::setTabOrder(ui->updateWorthEdit, ui->updateShareEdit);
+    QWidget::setTabOrder(ui->updateShareEdit, ui->updateFeeEdit);
+    QWidget::setTabOrder(ui->updateFeeEdit, ui->computeBaseEdit);
+    QWidget::setTabOrder(ui->computeBaseEdit, ui->computeRateEdit);
+    QWidget::setTabOrder(ui->computeRateEdit, ui->computeMultEdit);
+    QWidget::setTabOrder(ui->computeMultEdit, ui->computePowEdit);
+    QWidget::setTabOrder(ui->computePowEdit, ui->filePathEdit);
 }
 
 void MainWindow::printMessage(const QString& msg)

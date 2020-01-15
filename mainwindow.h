@@ -82,6 +82,8 @@ private:
 
     Record csvGetWithId(int id);
 
+    void setTCOrder();
+
 public slots:
     void printMessage(const QString& msg);
 

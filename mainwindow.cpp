@@ -9,7 +9,6 @@ MainWindow::MainWindow(QWidget *parent)
     server = new Server(saveFilePath);
 
     ui->setupUi(this);
-
     ui->newDateEdit->setValidator(OnlyInt);
     ui->newDateEdit->setText(dateToInteger(QDate::currentDate()));
 

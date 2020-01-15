@@ -46,6 +46,8 @@ private slots:
 
     void on_exportButton_clicked();
 
+    void on_exportButton_2_clicked();
+
 private:
     int rowNumber = 0;
     int tableHSize = 30;
@@ -55,7 +57,10 @@ private:
     QFont font;
     RecordList recordList;
 
-    QString saveFilePath = "cash.db";
+    QString configFilePath = "/opt/CashGraph/config.ini";
+    QString DataKey = "DATA_BASE_FILE";
+
+    QSettings *setting;
 
     Server *server;
     Ui::MainWindow *ui;
@@ -74,8 +79,6 @@ private:
 
     void displayAllRecord();
 
-    QString formatDate(int dateInteger);
-
     inline QString dateToInteger(QDate date);
 
     QString getText(QLineEdit *lineEdit);
@@ -83,6 +86,8 @@ private:
     Record csvGetWithId(int id);
 
     void setTCOrder();
+
+    void initConfig();
 
 public slots:
     void printMessage(const QString& msg);

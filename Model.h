@@ -3,18 +3,24 @@
 
 #include<QList>
 #include<QString>
-#include<QDebug>
-#include <QObject>
+#include<QStringList>
 
+#include<QDebug>
+#include<QObject>
 #include<QFileInfo>
 #include<QDir>
 #include<QFile>
+#include<QSettings>
+#include<QMap>
+
 
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
 
 #include "QMainWindow"
+
+typedef QMap<QString, QString> DictSS;
 
 class Record
 {
@@ -34,7 +40,15 @@ public:
     bool operator==(const int d) {return date == d;}
 
     QString stringId(){return QString::number(id,10);}
-    QString stringDate(){ return QString::number(date, 10); }
+    QString stringDate()
+    {
+        // 20180101 [0-4][4-6][6]
+        QString dTemp = QString::number(date, 10);
+        QString year = dTemp.mid(0,4);
+        QString month = dTemp.mid(4,2);
+        QString day = dTemp.mid(6);
+        return year + '-' + month + '-' + day;
+    }
     QString stringInv(){ return QString::number(investment, 10); }
     QString stringWorth(){ return QString::number(worth, 10, 4); }
     QString stringShare(){ return QString::number(share, 10, 2); }
@@ -50,9 +64,6 @@ public:
     Server(QString sfp):saveFilePath(sfp){
         session = QSqlDatabase::addDatabase("QSQLITE");
 
-        QString currentDir = QDir::currentPath();
-        absFilePath = linkPath(currentDir, saveFilePath);
-
         initSession();
     }
     ~Server(){
@@ -61,7 +72,7 @@ public:
 
     void initSession()
     {
-        session.setDatabaseName(absFilePath);
+        session.setDatabaseName(saveFilePath);
 
         if(session.open())
         {
@@ -72,7 +83,6 @@ public:
 
     bool tableCashExists();
     void createCashTable();
-    QString linkPath(QString root, QString filePath){ return root + '/' + filePath; }
     void insert(Record r);
     void deleteWithId(int id);
     void updateWithRecord(Record r);
@@ -80,16 +90,14 @@ public:
     void searchWithDate(int date, Record *r);
     void searchAll(RecordList *rList);
     Record queryToRecord(QSqlQuery &q);
-
+    QString linkPath(QString root, QString filePath){ return root + '/' + filePath; }
     void setFilePath(QString filePath)
     {
         saveFilePath = filePath;
-        absFilePath = filePath;
         initSession();
     }
 
     QString saveFilePath;
-    QString absFilePath;
     QSqlDatabase session;
 
 signals:

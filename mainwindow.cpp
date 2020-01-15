@@ -5,10 +5,13 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-    font.setPixelSize(11);
-    server = new Server(saveFilePath);
-
     ui->setupUi(this);
+    ui->configFilePathLineEdit->setText(configFilePath);
+    initConfig();
+    font.setPixelSize(11);
+
+    QString dbFilePath = setting->value("DATA_BASE_FILE", "没有找到配置文件").toString();
+    server = new Server(dbFilePath);
 
     setTCOrder();
 
@@ -35,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent)
     for(int c = 0; c < 6; c++)
         ui->tableWidget->setColumnWidth(c, tableItemVSize[c]);
 
-    ui->filePathEdit->setText(server->absFilePath);
+    ui->filePathEdit->setText(server->saveFilePath);
 
     server->searchAll(&recordList);
 
@@ -117,16 +120,6 @@ void MainWindow::displayAllRecord()
     on_addClearButton_clicked();
 }
 
-QString MainWindow::formatDate(int dateInteger)
-{
-    // 20180101 [0-4][4-6][6]
-    QString date = QString::number(dateInteger, 10);
-    QString year = date.mid(0,4);
-    QString month = date.mid(4,2);
-    QString day = date.mid(6);
-    return year + '-' + month + '-' + day;
-}
-
 QString MainWindow::dateToInteger(QDate date)
 {
     return date.toString("yyyyMMdd");
@@ -157,6 +150,13 @@ void MainWindow::setTCOrder()
     QWidget::setTabOrder(ui->computePowEdit, ui->filePathEdit);
 }
 
+void MainWindow::initConfig()
+{
+    qDebug() << "In initConfig()";
+    setting = new QSettings(configFilePath, QSettings::IniFormat);
+    printMessage("配置文件已找到");
+}
+
 void MainWindow::printMessage(const QString& msg)
 {
 
@@ -175,7 +175,7 @@ void MainWindow::on_updateSumButton_clicked()
     recordList.clear();
     server->searchAll(&recordList);
 
-    for (int i = 1; i < recordList.length(); i++) {
+    for (int i = 0; i < recordList.length(); i++) {
         Record r = recordList[i];
         sumInvestment += r.investment;
         sumShare += r.share;
@@ -195,9 +195,10 @@ void MainWindow::on_addNewRecordButton_clicked()
     int investment = getText(ui->newInvestmentEdit).toInt();
     double worth = getText(ui->newWorthEdit).toDouble();
     double share = getText(ui->newShareEdit).toDouble();
-    double fee = getText(ui->filePathEdit).toDouble();
+    double fee = getText(ui->newFeeEdit).toDouble();
 
     on_addClearButton_clicked();
+    on_updateSumButton_clicked();
 
     server->insert(Record(date, investment, worth, share, fee));
     printMessage("添加记录 完成");
@@ -318,4 +319,14 @@ void MainWindow::on_exportButton_clicked()
     server->setFilePath(ui->filePathEdit->text());
     printMessage("数据载入完成");
     displayAllRecord();
+}
+
+void MainWindow::on_exportButton_2_clicked()
+{
+    configFilePath = ui->configFilePathLineEdit->text();
+    initConfig();
+    QString dbFilePath = setting->value(DataKey).toString();
+    ui->filePathEdit->setText(dbFilePath);
+    printMessage("配置载入完成");
+    on_exportButton_clicked();
 }
